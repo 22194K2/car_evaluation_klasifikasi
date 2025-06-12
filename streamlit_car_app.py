@@ -33,7 +33,7 @@ def load_model():
         st.error(f"Error loading model: {str(e)}")
         st.stop()
 
-def predict_income(data, model_components):
+def predict_class(data, model_components):
     """Make car evaluation using the trained model"""
     # Convert to DataFrame if needed
     if isinstance(data, dict):
@@ -47,9 +47,13 @@ def predict_income(data, model_components):
     feature_names = model_components['feature_names']
     
     # Apply encodings to categorical columns
+    # st.write(df)
+    # st.write(encoding_maps)
     for column in df.columns:
         if column in encoding_maps and column != 'class':
             df[column] = df[column].map(encoding_maps[column])
+            
+    # st.write(df)
     
     # Ensure we only use features that the model was trained on
     df_for_pred = df[feature_names].copy()
@@ -57,16 +61,16 @@ def predict_income(data, model_components):
     # Make prediction
     prediction = model.predict(df_for_pred)[0]
     probabilities = model.predict_proba(df_for_pred)[0]
-    class_index = list(model.classes_).index(prediction)
+    # class_index = list(model.classes_).index(prediction)
     
     # Get income label
     income_map_inverse = {v: k for k, v in encoding_maps['class'].items()}
     prediction_label = income_map_inverse[prediction]
 
     return {
-        'prediction': prediction,
+        'prediction': int(prediction),
         'prediction_label': prediction_label,
-        'probability': probabilities[class_index],
+        'probability': float(probabilities[prediction]),
         'probabilities': probabilities.tolist()
     }
 
@@ -130,9 +134,9 @@ buying_options = ['vhigh','high','med','low']
 
 maint_options = ['vhigh','high','med','low']
 
-doors_options = ['2','3','4','5more']
+# doors_options = ['2','3','4','5more']
 
-persons_options = ['2','4','more']
+# persons_options = ['2','4','more']
 
 lug_boot_options = ['small','med','big']
 
@@ -156,11 +160,11 @@ with col1:
         
         with col_demo1:
             buying = st.selectbox("Buying", buying_options, key="buying")
-            maint = st.selectbox("Maint", maint_options, key="maint")
-            doors = st.selectbox("Doors", doors_options, key="doors")
+            maint = st.selectbox("Maintenance", maint_options, key="maint")
+            doors = st.number_input("Doors", min_value=1, max_value=99, value=2, key="doors")
         
         with col_demo2:
-            persons = st.selectbox("Persons", persons_options, key="persons")
+            persons = st.number_input("Persons", min_value=1, max_value=99, value=2, key="persons")
             lug_boot = st.selectbox("Luggage", lug_boot_options, key="lug_boot")
             safety = st.selectbox("Safety", safety_options, key="safety")
         
@@ -228,7 +232,7 @@ if predict_button:
     else:
         # Make prediction
         try:
-            result = predict_income(input_data, model_components)
+            result = predict_class(input_data, model_components)
             
             # Store result in session state for export
             st.session_state['last_prediction'] = {
