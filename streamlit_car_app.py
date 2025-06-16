@@ -134,9 +134,9 @@ buying_options = ['vhigh','high','med','low']
 
 maint_options = ['vhigh','high','med','low']
 
-# doors_options = ['2','3','4','5more']
+doors_options = ['2','3','4','5more']
 
-# persons_options = ['2','4','more']
+persons_options = ['2','4','more']
 
 lug_boot_options = ['small','med','big']
 
@@ -161,10 +161,10 @@ with col1:
         with col_demo1:
             buying = st.selectbox("Buying", buying_options, key="buying")
             maint = st.selectbox("Maintenance", maint_options, key="maint")
-            doors = st.number_input("Doors", min_value=1, max_value=99, value=2, key="doors")
+            doors = st.selectbox("Doors", doors_options, key="doors")
         
         with col_demo2:
-            persons = st.number_input("Persons", min_value=1, max_value=99, value=2, key="persons")
+            persons = st.selectbox("Persons", persons_options, key="persons")
             lug_boot = st.selectbox("Luggage", lug_boot_options, key="lug_boot")
             safety = st.selectbox("Safety", safety_options, key="safety")
         
